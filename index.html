@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>内控-外控人格量表测试 | 创新创业拓展</title>
+    <style>
+        * {margin: 0; padding: 0; box-sizing: border-box; font-family: "微软雅黑", sans-serif;}
+        body {min-height: 100vh; color: #333; background: #f5f5f5; padding: 20px;}
+        /* 沙盒背景选择页 */
+        .bg-page {display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; padding-top: 50px;}
+        .bg-title {font-size: 22px; font-weight: bold; text-align: center;}
+        .bg-list {display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; width: 100%; max-width: 400px;}
+        .bg-item {border: 2px solid #ddd; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.3s;}
+        .bg-item:hover {border-color: #2196F3; background: #e3f2fd;}
+        .bg-item img {width: 80px; height: 80px; border-radius: 5px; margin-bottom: 10px;}
+        /* 答题页 */
+        .test-page {display: none; flex-direction: column; gap: 30px;}
+        .progress {width: 100%; height: 10px; background: #eee; border-radius: 5px; overflow: hidden;}
+        .progress-bar {height: 100%; background: #2196F3; width: 0%; transition: width 0.3s;}
+        .progress-text {font-size: 14px; color: #666; text-align: right;}
+        .question-box {background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .q-num {font-size: 16px; color: #2196F3; font-weight: bold; margin-bottom: 10px;}
+        .q-content {font-size: 18px; line-height: 1.5; margin-bottom: 25px;}
+        .option-list {display: flex; flex-direction: column; gap: 15px;}
+        .option {border: 2px solid #ddd; border-radius: 10px; padding: 20px; font-size: 16px; text-align: center; cursor: pointer; transition: all 0.3s;}
+        .option:hover {border-color: #2196F3; background: #e3f2fd;}
+        .option.active {border-color: #2196F3; background: #2196F3; color: #fff;}
+        /* 结果页 */
+        .result-page {display: none; flex-direction: column; gap: 25px; padding-top: 20px;}
+        .result-card {background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);}
+        .result-title {font-size: 24px; font-weight: bold; text-align: center; margin-bottom: 20px; color: #2196F3;}
+        .score-box {display: flex; justify-content: space-around; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #eee;}
+        .score-item {text-align: center;}
+        .score-num {font-size: 30px; font-weight: bold; color: #333;}
+        .score-name {font-size: 14px; color: #666; margin-top: 5px;}
+        .type-box {text-align: center; margin-bottom: 25px;}
+        .type-name {font-size: 20px; font-weight: bold; margin-bottom: 10px;}
+        .type-desc {font-size: 14px; color: #666; line-height: 1.5;}
+        .analysis-box {line-height: 1.8; font-size: 16px;}
+        .analysis-title {font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333;}
+        .btn-box {display: flex; gap: 15px; justify-content: center; margin-top: 20px;}
+        .btn {padding: 12px 25px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.3s;}
+        .btn-primary {background: #2196F3; color: #fff;}
+        .btn-primary:hover {background: #1976D2;}
+        .btn-default {background: #fff; border: 1px solid #ddd; color: #333;}
+        .btn-default:hover {background: #f5f5f5;}
+        /* 沙盒背景样式 */
+        .bg1 {background: #f5f5f5;}
+        .bg2 {background: #f0f8ff;}
+        .bg3 {background: #f8f5e6;}
+    </style>
+</head>
+<body class="bg1" id="body">
+    <!-- 第一步：沙盒背景选择页 -->
+    <div class="bg-page" id="bgPage">
+        <div class="bg-title">创新创业人格量表测试</div>
+        <div class="bg-title" style="font-size: 16px; color: #666; font-weight: normal;">选择你喜欢的答题背景</div>
+        <div class="bg-list">
+            <div class="bg-item" onclick="setBg('bg1')">
+                <img src="https://img.icons8.com/fluency/96/000000/minimalism.png" alt="简约风">
+                <div>简约风</div>
+            </div>
+            <div class="bg-item" onclick="setBg('bg2')">
+                <img src="https://img.icons8.com/fluency/96/000000/school.png" alt="校园风">
+                <div>校园风</div>
+            </div>
+            <div class="bg-item" onclick="setBg('bg3')">
+                <img src="https://img.icons8.com/fluency/96/000000/startup.png" alt="创业风">
+                <div>创业风</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第二步：答题页 -->
+    <div class="test-page" id="testPage">
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">1/29</div>
+        <div class="question-box" id="questionBox">
+            <div class="q-num" id="qNum">第1题</div>
+            <div class="q-content" id="qContent">A.儿童陷于苦恼是因为父母动辄处罚他们。<br>B.父母对儿童管教太松,使得今天的大部分儿童常惹来麻烦。</div>
+            <div class="option-list">
+                <div class="option" onclick="selectOption('A')">A</div>
+                <div class="option" onclick="selectOption('B')">B</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 第三步：结果页 -->
+    <div class="result-page" id="resultPage">
+        <div class="result-card">
+            <div class="result-title">你的人格量表测试报告</div>
+            <div class="score-box">
+                <div class="score-item">
+                    <div class="score-num" id="innerScore">0</div>
+                    <div class="score-name">内控分数</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-num" id="outerScore">0</div>
+                    <div class="score-name">外控分数</div>
+                </div>
+            </div>
+            <div class="type-box">
+                <div class="type-name" id="typeName">平衡型人格</div>
+                <div class="type-desc" id="typeDesc">你的内控与外控分数相差小于10分，无明显归因倾向，根据场景灵活判断</div>
+            </div>
+            <div class="analysis-box">
+                <div class="analysis-title">一、人格优势&劣势</div>
+                <div id="analysisText">
+                    【平衡型优势】：既不会过度自责，也不会轻易放弃努力，能客观看待自身与环境的关系，适应能力强；<br>
+                    【平衡型劣势】：部分场景下可能出现归因犹豫，缺乏明确的行动导向；<br>
+                    【创业适配】：适合团队核心/协调者，能兼顾自身努力与市场环境，避免盲目激进或消极佛系。
+                </div>
+            </div>
+        </div>
+        <div class="btn-box">
+            <button class="btn btn-default" onclick="restartTest()">重新测试</button>
+            <button class="btn btn-primary" onclick="saveResult()">保存结果卡片</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. 测试题库：题文 + 内控题项标识（A/B为内控则标为true）
+        const questions = [
+            {content: "A.儿童陷于苦恼是因为父母动辄处罚他们。<br>B.父母对儿童管教太松,使得今天的大部分儿童常惹来麻烦。", inner: {A:true, B:false}},
+            {content: "A.人生有许多不愉快的事,部分归因于运气欠佳。<br>B.人们的不幸是由他们所造成的错误而引起的。", inner: {A:false, B:true}},
+            {content: "A.之所以会有战争,一个主要原因是人们对政治缺乏充分的兴趣。<br>B.不管人们如何竭尽心力去设法防止战争,战争总是难免的。", inner: {A:true, B:false}},
+            {content: "A.在这世界上,人们终究能获得他们所应得到的尊重。<br>B.很不幸,不论个人如何努力,个人的价值时常不被肯定。", inner: {A:true, B:false}},
+            {content: "A.认为老师对待学生不公平,这种想法是荒谬的。<br>B.大多数学生不明白他们的成绩受意外因素影响有多大。", inner: {A:true, B:false}},
+            {content: "A.一个人如果没有很好的运气,就不能成为优秀的领袖。<br>B.有能力而不能成为领导者的人,是因为他们没有抓住机会。", inner: {A:false, B:true}},
+            {content: "A.不管你怎样用尽苦心,某些人也不会喜欢你。<br>B.不能得到别人喜欢的人,是因为不知道如何与别人相处。", inner: {A:false, B:true}},
+            {content: "A.遗传是决定个人人格的主要因素。<br>B.个人的生活经验才是决定个人人格的因素。", inner: {A:false, B:true}},
+            {content: "A.我时常发觉命运支配着一切,该来的总会来。<br>B.对我来说,相信命运总不如自己决定行动的正确方向来得好些。", inner: {A:false, B:true}},
+            {content: "A.假如学生有充分准备,便无所谓有不公平的考试。<br>B.考试题目常与课程无关,用功也没用。", inner: {A:true, B:false}},
+            {content: "A.成功乃是努力的结果,运气对它很少甚至毫无作用。<br>B.得到一份好的工作,主要靠有好机会。", inner: {A:true, B:false}},
+            {content: "A.一般公民对政府的决策是有影响力的。<br>B.这世界为少数有能力人士所操纵,大众小民无能为力。", inner: {A:true, B:false}},
+            {content: "A.当我拟定计划时,我就确信能够实现。<br>B.拟定太过长远的计划未必是明智之举,因为未来的事情要看运气的好坏而定。", inner: {A:true, B:false}},
+            {content: "A.有一些人的确一无是处。<br>B.每个人都有一些优点。", inner: {A:false, B:true}},
+            {content: "A.在许多情况下,个人的成功绝少与运气有关。<br>B.许多时候我们能够用掷铜板的方法来决定我们应该做些什么。", inner: {A:true, B:false}},
+            {content: "A.能够成为领袖的人,经常是那种很幸运且先得到适当机会的人。<br>B.做事成功,要靠能力,运气是不会有太大关系的。", inner: {A:false, B:true}},
+            {content: "A.就世事而论,我们大多数人成为强权的牺牲者,我们对强权不能了解,也无法控制。<br>B.人们主动参与政治与社会事务,便能控制世界大事。", inner: {A:false, B:true}},
+            {content: "A.大多数人都不了解他们的生活被意外事件所操纵的程度。<br>B.严格说来,根本就没有所谓的\"运气\"这回事。", inner: {A:false, B:true}},
+            {content: "A.每个人都应该敢于承认自己的过错。<br>B.一个人最好是掩饰自己的过错。", inner: {A:true, B:false}},
+            {content: "A.要知道一个人是否真正喜欢你是件困难的事。<br>B.你有多少朋友,完全看你是怎样对待他人的。", inner: {A:false, B:true}},
+            {content: "A.发生在人们身上的事情,总是好坏参半的。<br>B.大多数的不幸是由能力不够、无知或懒惰引起的。", inner: {A:false, B:true}},
+            {content: "A.只要我们足够努力,就能消除政治上的腐败。<br>B.人们要控制政府官员的所作所为是相当困难的事。", inner: {A:true, B:false}},
+            {content: "A.有时候我实在不了解老师是凭什么给分数的。<br>B.我下多少功夫,便能得到多少分数。", inner: {A:false, B:true}},
+            {content: "A.贤明的领袖希望人民自己决定应该做些什么。<br>B.贤明的领袖会清楚地告诉人民他们应该做些什么。", inner: {A:true, B:false}},
+            {content: "A.我常常觉得对很多事情无能为力。<br>B.我不相信机会或者运气对我一生是重要的。", inner: {A:false, B:true}},
+            {content: "A.人们感到孤独,因为他们不够友善。<br>B.想办法取悦别人并没有多大用处,别人若喜欢你,自然就会喜欢你。", inner: {A:true, B:false}},
+            {content: "A.学校太重视体育活动了。<br>B.团队运动是培养品格的好方法。", inner: {A:false, B:true}},
+            {content: "A.发生在我身上的挫败都是我自作自受的结果。<br>B.对于自己生活的方向,我有时觉得没有足够的把握来适当地控制。", inner: {A:true, B:false}},
+            {content: "A.通常我不太关心各种社会现象背后的真正原因。<br>B.每个人都是社会中的一分子,应该履行对社会承担的责任。", inner: {A:false, B:true}}
+        ];
+        // 全局变量
+        let currentQ = 0; // 当前题目索引
+        let innerScore = 0; // 内控分数
+        let outerScore = 0; // 外控分数
+        let selectedBg = "bg1"; // 沙盒背景
+
+        // 沙盒功能：设置答题背景
+        function setBg(bg) {
+            selectedBg = bg;
+            document.getElementById("body").className = bg;
+            document.getElementById("bgPage").style.display = "none";
+            document.getElementById("testPage").style.display = "flex";
+            renderQuestion();
+        }
+
+        // 渲染当前题目
+        function renderQuestion() {
+            const q = questions[currentQ];
+            document.getElementById("qNum").innerText = `第${currentQ+1}题`;
+            document.getElementById("qContent").innerHTML = q.content;
+            document.getElementById("progressText").innerText = `${currentQ+1}/29`;
+            document.getElementById("progressBar").style.width = `${(currentQ+1)/29*100}%`;
+            // 重置选项样式
+            const options = document.querySelectorAll(".option");
+            options.forEach(opt => opt.classList.remove("active"));
+        }
+
+        // 选择选项并计分
+        function selectOption(ans) {
+            const q = questions[currentQ];
+            // 计分：内控题项选对得1分，否则外控得1分
+            if (q.inner[ans]) {
+                innerScore++;
+            } else {
+                outerScore++;
+            }
+            // 下一题或跳结果页
+            currentQ++;
+            if (currentQ < 29) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // 生成测试结果
+        function showResult() {
+            document.getElementById("testPage").style.display = "none";
+            document.getElementById("resultPage").style.display = "flex";
+            document.getElementById("innerScore").innerText = innerScore;
+            document.getElementById("outerScore").innerText = outerScore;
+            // 计算分数差，判断人格类型
+            const diff = Math.abs(innerScore - outerScore);
+            let typeName, typeDesc, analysisText;
+            if (innerScore > outerScore && diff > 10) {
+                // 内控型
+                typeName = "内控型人格";
+                typeDesc = `你的内控分数（${innerScore}）远高于外控分数（${outerScore}），倾向内在归因，相信人定胜天`;
+                analysisText = "【内控型优势】：做事积极主动，相信努力的价值，自我驱动力强，面对困难更易坚持，对自身行为有强掌控感；<br>【内控型劣势】：自我要求过高，易因失败过度自责、产生焦虑，有时会忽视客观环境的限制；<br>【创业适配】：适合创业发起人/核心决策者，能带领团队突破困境，对目标有坚定的执行力，需注意结合市场实际调整预期。";
+            } else if (outerScore > innerScore && diff > 10) {
+                // 外控型
+                typeName = "外控型人格";
+                typeDesc = `你的外控分数（${outerScore}）远高于内控分数（${innerScore}），倾向外在归因，受客观情境影响较大`;
+                analysisText = "【外控型优势】：心态更乐观，不会因失败过度苛责自己，能坦然接受环境的不确定性，人际关系中更易包容；<br>【外控型劣势】：易产生“听天由命”的想法，面对挫折容易放弃努力，缺乏自主掌控感，错失发展机会；<br>【创业适配】：适合团队中的创意/辅助角色，能敏锐感知市场环境变化，需搭配内控型伙伴，弥补行动执行力的不足。";
+            } else {
+                // 平衡型
+                typeName = "平衡型人格";
+                typeDesc = `你的内控分数（${innerScore}）与外控分数（${outerScore}）相差小于10分，无明显归因倾向，根据场景灵活判断`;
+                analysisText = "【平衡型优势】：既不会过度自责，也不会轻易放弃努力，能客观看待自身能力与外部环境的关系，适应能力强，情绪更稳定；<br>【平衡型劣势】：部分场景下可能出现归因犹豫，缺乏明确的行动导向，容易在“努力”和“顺势”之间摇摆；<br>【创业适配】：适合团队核心/协调者，能兼顾自身努力与市场环境变化，避免盲目激进或消极佛系，是创业团队的“稳定器”。";
+            }
+            // 渲染结果
+            document.getElementById("typeName").innerText = typeName;
+            document.getElementById("typeDesc").innerText = typeDesc;
+            document.getElementById("analysisText").innerHTML = analysisText;
+        }
+
+        // 重新测试
+        function restartTest() {
+            currentQ = 0;
+            innerScore = 0;
+            outerScore = 0;
+            document.getElementById("resultPage").style.display = "none";
+            document.getElementById("bgPage").style.display = "flex";
+        }
+
+        // 保存结果卡片（手机端长按保存图片）
+        function saveResult() {
+            alert("已为你生成测试结果卡片，手机端可长按页面截图保存，分享给同学/老师！");
+        }
+    </script>
+</body>
+</html>
